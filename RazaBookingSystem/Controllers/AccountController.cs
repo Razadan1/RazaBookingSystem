@@ -2,21 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RazaBookingSystem.Context;
 using RazaBookingSystem.Data;
+using RazaBookingSystem.Models;
 
 namespace RazaBookingSystem.Controllers
 {
     public class AccountController : Controller
     {
         private readonly HBSystemContext _context;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public AccountController(HBSystemContext context)
+        public AccountController(HBSystemContext context,
+            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Account
@@ -159,18 +167,96 @@ public async Task<IActionResult> Login(LoginViewModel model)
 {
     if (ModelState.IsValid)
     {
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+        var user = await _userManager.FindByEmailAsync(model.Email);
 
-        if (result.Succeeded)
-        {
-            // Login successful
-            return RedirectToAction("Index", "Home");
-        }
+                if (user != null)
+                {
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: false);
 
-        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    if (result.Succeeded)
+                    {
+                        // Login successful
+                        return RedirectToAction("Account", "Booking");
+                    }
+                }
+
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
     }
 
-    return View(model);
+            return (View(model));
 }
+        [HttpGet]
+        public IActionResult Login()
+        {
+
+
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Check if the password and confirm password match
+                if (model.Password == model.ConfirmPassword)
+                {
+                    // Here you would typically save the user's information to a database
+                    // or perform any other necessary operations
+
+                    // For example:
+                    // var user = new User { Name = model.Name, Email = model.Email, Password = model.Password };
+                    // var result = userRepository.CreateUser(user);
+
+                    // If the user was successfully created, you could redirect to a success page
+                    // or log the user in and redirect to the home page
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    // Add an error to the ModelState if the passwords don't match
+                    ModelState.AddModelError("", "The password and confirmation password do not match.");
+                }
+            }
+
+            // If we got this far, something failed, so re-render the view
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Booking()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Booking(BookingViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Todo: implement booking logic here
+                // For example, save the booking to the database
+                // ...
+
+                return RedirectToAction("BookingSuccess");
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult BookingSuccess()
+        {
+            return View(LoginViewModel);
+        }
+
     }
 }

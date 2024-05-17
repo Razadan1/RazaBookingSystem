@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MySql.EntityFrameworkCore.Extensions;
 using RazaBookingSystem.Context;
 using RazaBookingSystem.Data;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,11 @@ builder.Services.AddDbContext<HBSystemContext>(options =>
 {
     options.UseMySQL(builder.Configuration.GetConnectionString("HBSystemConnectionString")!);
 });
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<HBSystemContext>()
+    .AddDefaultTokenProviders();
+
 
 var app = builder.Build();
 

@@ -2,11 +2,16 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection;
 using RazaBookingSystem.Data;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace RazaBookingSystem.Context
 {
-    public class HBSystemContext(DbContextOptions<HBSystemContext> options) : IdentityDbContext(options)
+    public class HBSystemContext : IdentityDbContext<IdentityUser>
     {
+        public HBSystemContext(DbContextOptions<HBSystemContext> options) : base (options)
+        {
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

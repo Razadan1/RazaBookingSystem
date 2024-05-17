@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,10 @@ namespace RazaBookingSystem
         {
             services.AddDbContext<HBSystemContext>(options =>
                 options.UseMySQL(Configuration.GetConnectionString("HBSystemConnectionString")!));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+        .AddEntityFrameworkStores<HBSystemContext>()
+        .AddDefaultTokenProviders();
 
             services.AddControllersWithViews();
         }

@@ -1,4 +1,6 @@
-﻿namespace RazaBookingSystem.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RazaBookingSystem.Models
 {
     public class LoginViewModel
     {
